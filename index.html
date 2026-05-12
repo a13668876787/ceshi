@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Viora AI 短视频工坊</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: rgba(15, 23, 42, 0.82);
+      --panel-strong: #111827;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --line: rgba(148, 163, 184, 0.24);
+      --brand: #22d3ee;
+      --hot: #fb7185;
+      --lime: #a3e635;
+      --amber: #fbbf24;
+      --radius: 8px;
+      font-family: Inter, "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(34, 211, 238, 0.18), transparent 26rem),
+        radial-gradient(circle at 86% 18%, rgba(251, 113, 133, 0.16), transparent 24rem),
+        linear-gradient(135deg, #080b16 0%, #111827 52%, #121826 100%);
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .topbar {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 0 clamp(18px, 4vw, 56px);
+      border-bottom: 1px solid var(--line);
+      background: rgba(2, 6, 23, 0.7);
+      backdrop-filter: blur(18px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, var(--brand), transparent 58%),
+        linear-gradient(315deg, var(--hot), #7c3aed);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 18px 38px rgba(34, 211, 238, 0.18);
+      flex: 0 0 auto;
+    }
+
+    .brand-mark::before {
+      content: "";
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 13px solid white;
+      margin-left: 3px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .brand span {
+      color: var(--muted);
+      font-size: 12px;
+      display: block;
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav a {
+      color: inherit;
+      text-decoration: none;
+      padding: 9px 10px;
+      border-radius: 8px;
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-button,
+    .primary-button,
+    .ghost-button {
+      min-height: 40px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .icon-button {
+      width: 40px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+    }
+
+    .primary-button,
+    .ghost-button {
+      padding: 0 16px;
+      font-weight: 700;
+    }
+
+    .primary-button {
+      border-color: transparent;
+      color: #061018;
+      background: linear-gradient(135deg, var(--brand), var(--lime));
+      box-shadow: 0 16px 34px rgba(34, 211, 238, 0.2);
+    }
+
+    .main {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      padding: clamp(18px, 3vw, 40px);
+      display: grid;
+      grid-template-columns: minmax(330px, 0.74fr) minmax(360px, 1fr) minmax(320px, 0.78fr);
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-head h2,
+    .section-title {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #cbd5e1;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--lime);
+      box-shadow: 0 0 18px var(--lime);
+    }
+
+    .feed {
+      display: grid;
+      gap: 14px;
+      padding: 16px;
+    }
+
+    .video-card {
+      min-height: 164px;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background-size: cover;
+      background-position: center;
+      isolation: isolate;
+    }
+
+    .video-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, transparent 20%, rgba(2, 6, 23, 0.88) 100%),
+        linear-gradient(90deg, rgba(2, 6, 23, 0.62), transparent 55%);
+      z-index: -1;
+    }
+
+    .video-card:nth-child(1) {
+      background-image:
+        linear-gradient(135deg, rgba(34, 211, 238, 0.45), rgba(2, 6, 23, 0.1)),
+        url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80");
+    }
+
+    .video-card:nth-child(2) {
+      background-image:
+        linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(2, 6, 23, 0.1)),
+        url("https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80");
+    }
+
+    .video-card:nth-child(3) {
+      background-image:
+        linear-gradient(135deg, rgba(251, 113, 133, 0.3), rgba(2, 6, 23, 0.1)),
+        url("https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=900&q=80");
+    }
+
+    .play {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.38);
+      background: rgba(15, 23, 42, 0.72);
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: grid;
+      place-items: center;
+    }
+
+    .play::before {
+      content: "";
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 13px solid white;
+      margin-left: 3px;
+    }
+
+    .video-info {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 14px;
+    }
+
+    .tag-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .tag {
+      color: #dbeafe;
+      background: rgba(15, 23, 42, 0.68);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      font-size: 12px;
+      padding: 5px 9px;
+    }
+
+    .video-info h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .metrics {
+      display: flex;
+      gap: 12px;
+      color: #cbd5e1;
+      font-size: 12px;
+    }
+
+    .stage {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 760px;
+    }
+
+    .creator {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .prompt-box {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 10px;
+    }
+
+    label {
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    textarea,
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--text);
+      background: rgba(2, 6, 23, 0.55);
+      outline: none;
+      resize: none;
+    }
+
+    textarea {
+      min-height: 118px;
+      padding: 14px;
+      line-height: 1.6;
+    }
+
+    input {
+      height: 42px;
+      padding: 0 12px;
+    }
+
+    textarea:focus,
+    input:focus {
+      border-color: rgba(34, 211, 238, 0.72);
+      box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.12);
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .segmented,
+    .chip-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .segmented {
+      grid-template-columns: repeat(3, 1fr);
+      padding: 4px;
+      border-radius: 8px;
+      background: rgba(2, 6, 23, 0.55);
+      border: 1px solid var(--line);
+    }
+
+    .segmented button {
+      height: 34px;
+      border: 0;
+      border-radius: 6px;
+      color: var(--muted);
+      background: transparent;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .segmented button.active {
+      color: #07111c;
+      background: var(--brand);
+    }
+
+    .chip-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .chip-grid button {
+      min-height: 40px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.06);
+      font-size: 13px;
+    }
+
+    .chip-grid button.active {
+      border-color: rgba(163, 230, 53, 0.72);
+      background: rgba(163, 230, 53, 0.12);
+    }
+
+    .style-library {
+      display: grid;
+      gap: 8px;
+    }
+
+    .style-tabs {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .style-grid {
+      min-height: 136px;
+    }
+
+    .style-grid button {
+      text-align: center;
+      transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+    }
+
+    .preview-wrap {
+      padding: 0 18px 18px;
+      display: grid;
+      place-items: center;
+    }
+
+    .phone {
+      width: min(342px, 100%);
+      aspect-ratio: 9 / 16;
+      border-radius: 34px;
+      padding: 12px;
+      background: linear-gradient(150deg, #1f2937, #020617);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 30px 90px rgba(0, 0, 0, 0.45);
+    }
+
+    .screen {
+      height: 100%;
+      border-radius: 24px;
+      overflow: hidden;
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(2, 6, 23, 0.1) 0%, rgba(2, 6, 23, 0.84) 100%),
+        url("https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=700&q=80");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 4px);
+      mix-blend-mode: overlay;
+      opacity: 0.38;
+      pointer-events: none;
+    }
+
+    .caption {
+      position: absolute;
+      left: 18px;
+      right: 76px;
+      bottom: 86px;
+      z-index: 2;
+    }
+
+    .caption b {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 17px;
+    }
+
+    .caption span {
+      color: #e2e8f0;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .side-actions {
+      position: absolute;
+      right: 16px;
+      bottom: 92px;
+      z-index: 3;
+      display: grid;
+      gap: 12px;
+    }
+
+    .round-action {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(2, 6, 23, 0.55);
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+    }
+
+    .timeline {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 28px;
+      z-index: 4;
+      height: 48px;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 0.9fr 1fr;
+      gap: 5px;
+      align-items: end;
+    }
+
+    .clip {
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .clip:nth-child(1) { height: 26px; background: var(--brand); }
+    .clip:nth-child(2) { height: 40px; background: var(--hot); }
+    .clip:nth-child(3) { height: 31px; background: var(--amber); }
+    .clip:nth-child(4) { height: 36px; background: var(--lime); }
+
+    .generate-bar {
+      padding: 16px 18px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      gap: 10px;
+    }
+
+    .generate-bar .primary-button {
+      flex: 1;
+    }
+
+    .insights {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+    }
+
+    .score {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .score-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .score-number {
+      font-size: 52px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .score-copy {
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 13px;
+    }
+
+    .bars {
+      display: grid;
+      gap: 12px;
+    }
+
+    .bar {
+      display: grid;
+      gap: 7px;
+    }
+
+    .bar span {
+      display: flex;
+      justify-content: space-between;
+      color: #cbd5e1;
+      font-size: 12px;
+    }
+
+    .track {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--brand), var(--lime));
+    }
+
+    .script {
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      gap: 12px;
+    }
+
+    .script-line {
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .time {
+      color: var(--brand);
+      font-weight: 800;
+      font-size: 12px;
+      padding-top: 3px;
+    }
+
+    .script-line p {
+      margin: 0;
+      color: #dbeafe;
+      line-height: 1.55;
+      font-size: 13px;
+    }
+
+    .assets {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .asset-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .asset-item {
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .asset-thumb {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--brand), var(--hot));
+    }
+
+    .asset-item:nth-child(2) .asset-thumb {
+      background: linear-gradient(135deg, var(--amber), #ef4444);
+    }
+
+    .asset-item:nth-child(3) .asset-thumb {
+      background: linear-gradient(135deg, var(--lime), #14b8a6);
+    }
+
+    .asset-item b {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    .asset-item span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .asset-item small {
+      color: var(--lime);
+      font-weight: 800;
+    }
+
+    @media (max-width: 1120px) {
+      .main {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .insights {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar {
+        height: auto;
+        min-height: 72px;
+        flex-wrap: wrap;
+        padding-top: 14px;
+        padding-bottom: 14px;
+      }
+
+      .nav {
+        order: 3;
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      .actions .ghost-button {
+        display: none;
+      }
+
+      .main {
+        grid-template-columns: 1fr;
+        padding: 14px;
+      }
+
+      .stage {
+        min-height: auto;
+      }
+
+      .creator {
+        grid-template-columns: 1fr;
+      }
+
+      .feed {
+        grid-template-columns: 1fr;
+      }
+
+      .video-card {
+        min-height: 190px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand" aria-label="Viora AI">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div>
+          <h1>Viora AI 短视频工坊</h1>
+          <span>脚本、分镜、剪辑与发布一体化</span>
+        </div>
+      </div>
+      <nav class="nav" aria-label="主导航">
+        <a class="active" href="#">创作台</a>
+        <a href="#">灵感库</a>
+        <a href="#">数据洞察</a>
+        <a href="#">素材中心</a>
+      </nav>
+      <div class="actions">
+        <button class="icon-button" title="搜索" aria-label="搜索">⌕</button>
+        <button class="ghost-button">导入素材</button>
+        <button class="primary-button">新建视频</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>热门灵感</h2>
+          <span class="status">实时趋势</span>
+        </div>
+        <div class="feed">
+          <article class="video-card">
+            <button class="play" aria-label="播放城市大片模板"></button>
+            <div class="video-info">
+              <div class="tag-row">
+                <span class="tag">旅行</span>
+                <span class="tag">航拍感</span>
+                <span class="tag">18 秒</span>
+              </div>
+              <h3>把普通城市散步剪成电影预告片</h3>
+              <div class="metrics"><span>86.4w 播放</span><span>完播率 42%</span></div>
+            </div>
+          </article>
+          <article class="video-card">
+            <button class="play" aria-label="播放产品开箱模板"></button>
+            <div class="video-info">
+              <div class="tag-row">
+                <span class="tag">电商</span>
+                <span class="tag">开箱</span>
+                <span class="tag">口播</span>
+              </div>
+              <h3>3 个镜头讲清新品卖点和使用场景</h3>
+              <div class="metrics"><span>31.8w 播放</span><span>转化 +19%</span></div>
+            </div>
+          </article>
+          <article class="video-card">
+            <button class="play" aria-label="播放知识科普模板"></button>
+            <div class="video-info">
+              <div class="tag-row">
+                <span class="tag">知识</span>
+                <span class="tag">图文转视频</span>
+              </div>
+              <h3>把一段长文压缩成高密度科普短片</h3>
+              <div class="metrics"><span>12.6w 收藏</span><span>互动 +28%</span></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel stage">
+        <div class="panel-head">
+          <h2>AI 生成控制台</h2>
+          <span class="status">渲染队列空闲</span>
+        </div>
+        <div class="creator">
+          <div class="prompt-box">
+            <label for="prompt">视频创意</label>
+            <textarea id="prompt">一条 20 秒的 AI 短视频：夜晚音乐节里，主角用手机拍下人群、灯光和舞台，节奏从安静铺垫到高潮爆发，画面高级、有电影颗粒感。</textarea>
+          </div>
+          <div class="field">
+            <label>比例</label>
+            <div class="segmented" role="group" aria-label="视频比例">
+              <button>16:9</button>
+              <button class="active">9:16</button>
+              <button>1:1</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="duration">时长</label>
+            <input id="duration" value="20 秒" />
+          </div>
+          <div class="field">
+            <label>风格</label>
+            <div class="style-library">
+              <div class="segmented style-tabs" role="tablist" aria-label="风格分类">
+                <button class="active" type="button" role="tab" aria-selected="true" data-style-category="影视">影视</button>
+                <button type="button" role="tab" aria-selected="false" data-style-category="商业">商业</button>
+                <button type="button" role="tab" aria-selected="false" data-style-category="社媒">社媒</button>
+                <button type="button" role="tab" aria-selected="false" data-style-category="知识">知识</button>
+              </div>
+              <div class="chip-grid style-grid" id="style-grid" aria-live="polite"></div>
+            </div>
+          </div>
+          <div class="field">
+            <label>声音</label>
+            <div class="chip-grid">
+              <button class="active">电子鼓点</button>
+              <button>温柔旁白</button>
+              <button>环境同期声</button>
+              <button>品牌音效</button>
+            </div>
+          </div>
+        </div>
+        <div class="preview-wrap">
+          <div class="phone" aria-label="短视频预览">
+            <div class="screen">
+              <div class="caption">
+                <b>今晚，城市开始发光</b>
+                <span>AI 已生成 6 个镜头、3 条转场和一版字幕节奏。</span>
+              </div>
+              <div class="side-actions" aria-hidden="true">
+                <div class="round-action">♡</div>
+                <div class="round-action">↗</div>
+                <div class="round-action">⋯</div>
+              </div>
+              <div class="timeline" aria-hidden="true">
+                <div class="clip"></div>
+                <div class="clip"></div>
+                <div class="clip"></div>
+                <div class="clip"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="generate-bar">
+          <button class="ghost-button">优化脚本</button>
+          <button class="primary-button" id="generate">生成预览</button>
+        </div>
+      </section>
+
+      <aside class="panel insights">
+        <div class="panel-head">
+          <h2>发布预测</h2>
+          <span class="status">模型已更新</span>
+        </div>
+        <section class="score">
+          <div class="score-top">
+            <div>
+              <div class="score-number">92</div>
+              <div class="score-copy">综合爆款指数，适合今晚 20:00-22:30 发布。</div>
+            </div>
+            <button class="icon-button" title="刷新预测" aria-label="刷新预测">↻</button>
+          </div>
+          <div class="bars">
+            <div class="bar">
+              <span><b>开头吸引力</b><em>96%</em></span>
+              <div class="track"><div class="fill" style="width: 96%"></div></div>
+            </div>
+            <div class="bar">
+              <span><b>节奏密度</b><em>88%</em></span>
+              <div class="track"><div class="fill" style="width: 88%"></div></div>
+            </div>
+            <div class="bar">
+              <span><b>字幕清晰度</b><em>91%</em></span>
+              <div class="track"><div class="fill" style="width: 91%"></div></div>
+            </div>
+          </div>
+        </section>
+        <section class="script">
+          <h3 class="section-title">AI 分镜脚本</h3>
+          <div class="script-line">
+            <span class="time">00:00</span>
+            <p>黑场切入，远处低频鼓点，手机屏幕点亮，人群轮廓被灯光扫过。</p>
+          </div>
+          <div class="script-line">
+            <span class="time">00:05</span>
+            <p>快速蒙太奇：手环、舞台、镜头反光，字幕压在画面下三分之一。</p>
+          </div>
+          <div class="script-line">
+            <span class="time">00:13</span>
+            <p>副歌爆发，切到广角人群，加入轻微推拉和闪白转场。</p>
+          </div>
+        </section>
+        <section class="assets">
+          <h3 class="section-title">生成素材</h3>
+          <div class="asset-list">
+            <div class="asset-item">
+              <div class="asset-thumb"></div>
+              <div><b>主视觉封面</b><span>1080 × 1920</span></div>
+              <small>完成</small>
+            </div>
+            <div class="asset-item">
+              <div class="asset-thumb"></div>
+              <div><b>节奏字幕</b><span>14 条字幕片段</span></div>
+              <small>完成</small>
+            </div>
+            <div class="asset-item">
+              <div class="asset-thumb"></div>
+              <div><b>配乐剪辑</b><span>20 秒高潮版</span></div>
+              <small>完成</small>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    const generate = document.querySelector("#generate");
+    const score = document.querySelector(".score-number");
+    const screen = document.querySelector(".screen");
+    const caption = document.querySelector(".caption");
+    const styleGrid = document.querySelector("#style-grid");
+    const styleTabs = document.querySelectorAll("[data-style-category]");
+    const stylePresets = {
+      "影视": ["电影感", "纪录片", "胶片复古", "悬疑预告", "梦幻慢镜", "都市夜景"],
+      "商业": ["产品大片", "开箱测评", "品牌广告", "餐饮种草", "服饰穿搭", "空间展示"],
+      "社媒": ["赛博潮流", "快节奏卡点", "Vlog 日常", "情绪氛围", "热梗混剪", "直播切片"],
+      "知识": ["知识口播", "图文科普", "数据解读", "课程预告", "财经分析", "历史故事"]
+    };
+    const styleCaptions = {
+      "电影感": ["今晚，城市开始发光", "影视风格已锁定：高反差灯光、电影颗粒和强节奏转场。"],
+      "纪录片": ["像真实故事一样展开", "AI 会保留环境声、观察镜头和更自然的旁白节奏。"],
+      "胶片复古": ["把画面染上旧日温度", "新增柔和高光、胶片色偏和轻微划痕质感。"],
+      "悬疑预告": ["前三秒先制造问题", "低频音效、暗部留白和快速切黑会强化悬念。"],
+      "梦幻慢镜": ["让情绪慢下来", "慢动作、柔焦光斑和延迟转场会突出氛围感。"],
+      "都市夜景": ["霓虹、街灯和人流", "AI 会强化夜景反光、冷暖对比和城市节奏。"],
+      "产品大片": ["产品成为主角", "镜头会强调材质、细节特写和品牌级收尾画面。"],
+      "开箱测评": ["开箱瞬间就是钩子", "加入手部动作、卖点字幕和真实体验节奏。"],
+      "品牌广告": ["更完整的品牌叙事", "画面会保持统一色彩、口号收束和高级转场。"],
+      "餐饮种草": ["先让味觉出现", "热气、拉丝、切面和咀嚼音会成为核心镜头。"],
+      "服饰穿搭": ["一套造型多种场景", "AI 会生成走动、转身和细节搭配镜头。"],
+      "空间展示": ["让空间自己说话", "广角推进、光线变化和布局亮点会被重点呈现。"],
+      "赛博潮流": ["高能视觉马上进入", "霓虹色、故障转场和电子鼓点会同步加强。"],
+      "快节奏卡点": ["每一拍都有画面回应", "剪辑点会贴合鼓点，强化停顿和爆发。"],
+      "Vlog 日常": ["真实感比炫技更重要", "镜头会更轻松，保留生活细节和自然字幕。"],
+      "情绪氛围": ["先抓住情绪，再讲内容", "低饱和色彩、慢节奏镜头和短句字幕会更突出。"],
+      "热梗混剪": ["让内容更容易被转发", "AI 会加入反差节奏、梗点字幕和快速重复。"],
+      "直播切片": ["把长内容压成高光", "自动提炼爆点、问题和回应，适合二次传播。"],
+      "知识口播": ["观点先行，信息跟上", "AI 会优化开头问题、要点字幕和结论收束。"],
+      "图文科普": ["复杂信息变得好看", "图文节奏、关键词放大和解释镜头会同步生成。"],
+      "数据解读": ["让数字有故事感", "图表镜头、结论字幕和对比信息会更清晰。"],
+      "课程预告": ["先给结果，再给路径", "AI 会突出课程收益、章节钩子和行动引导。"],
+      "财经分析": ["信息密度更高，但不压迫", "趋势、风险和结论会被拆成清晰字幕。"],
+      "历史故事": ["用人物和转折带动叙事", "时间线、旧影质感和悬念式旁白会自动匹配。"]
+    };
+    const captions = [
+      ["今晚，城市开始发光", "AI 已生成 6 个镜头、3 条转场和一版字幕节奏。"],
+      ["第 3 秒抓住注意力", "新增舞台闪白、观众回头和慢动作推近镜头。"],
+      ["一键改成品牌大片", "画面色温、字幕语气和配乐节点已同步优化。"]
+    ];
+    let index = 0;
+    let selectedStyle = "电影感";
+
+    function setCaption(styleName) {
+      const copy = styleCaptions[styleName] || captions[0];
+      caption.querySelector("b").textContent = copy[0];
+      caption.querySelector("span").textContent = copy[1];
+    }
+
+    function renderStyles(category) {
+      styleGrid.innerHTML = "";
+      stylePresets[category].forEach((styleName) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = styleName;
+        button.className = styleName === selectedStyle ? "active" : "";
+        button.addEventListener("click", () => {
+          selectedStyle = styleName;
+          styleGrid.querySelectorAll("button").forEach((item) => item.classList.remove("active"));
+          button.classList.add("active");
+          setCaption(styleName);
+        });
+        styleGrid.appendChild(button);
+      });
+    }
+
+    styleTabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        styleTabs.forEach((item) => {
+          item.classList.remove("active");
+          item.setAttribute("aria-selected", "false");
+        });
+        tab.classList.add("active");
+        tab.setAttribute("aria-selected", "true");
+        selectedStyle = stylePresets[tab.dataset.styleCategory][0];
+        renderStyles(tab.dataset.styleCategory);
+        setCaption(selectedStyle);
+      });
+    });
+
+    renderStyles("影视");
+    setCaption(selectedStyle);
+
+    generate.addEventListener("click", () => {
+      index = (index + 1) % captions.length;
+      caption.querySelector("b").textContent = captions[index][0];
+      caption.querySelector("span").textContent = captions[index][1];
+      score.textContent = String(90 + Math.floor(Math.random() * 8));
+      screen.animate(
+        [
+          { filter: "brightness(1)", transform: "scale(1)" },
+          { filter: "brightness(1.18)", transform: "scale(1.018)" },
+          { filter: "brightness(1)", transform: "scale(1)" }
+        ],
+        { duration: 520, easing: "ease-out" }
+      );
+    });
+  </script>
+</body>
+</html>
